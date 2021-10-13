@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Part-DB CSV Export</title>
+</head>
+<body>
+    <h1>Part-DB CSV Export</h1>
+    <h2>Parts</h2>
+    <form action="parts.csv" method="get">
+        <label for="parts-start-id">Start-ID</label>
+        <input type="number" name="startID" id="parts-start-id">
+        <button type="submit">Download</button>
+    </form>
+    <h2>Locations</h2>
+    <form action="locations.csv" method="get">
+        <label for="locations-start-id">Start-ID</label>
+        <input type="number" name="startID" id="locations-start-id">
+        <button type="submit">Download</button>
+    </form>
+</body>
+</html>
