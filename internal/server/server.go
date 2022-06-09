@@ -6,10 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"github.com/patrick246/partdb-csv/internal/auth"
+	"github.com/patrick246/partdb-csv/internal/encoding"
 	"github.com/patrick246/partdb-csv/internal/query"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 //go:embed index.html
@@ -89,6 +91,11 @@ func (srv *Server) handlePartsRequest(writer http.ResponseWriter, request *http.
 		startId = 0
 	}
 
+	chosenEncoding := strings.ToLower(request.URL.Query().Get("encoding"))
+	if chosenEncoding == "" {
+		chosenEncoding = "utf-8"
+	}
+
 	parts, err := srv.querier.GetPartData(request.Context(), startId)
 	if err != nil {
 		log.Printf("error getting data: %s", err)
@@ -98,7 +105,15 @@ func (srv *Server) handlePartsRequest(writer http.ResponseWriter, request *http.
 
 	writer.Header().Set("Content-Type", "text/csv")
 	writer.Header().Set("Content-Disposition", "attachment; filename=parts.csv")
-	csvWriter := csv.NewWriter(writer)
+
+	encodingWriter, err := encoding.NewResponseWriter(writer, chosenEncoding)
+	if err != nil {
+		log.Printf("encoding error: %v", err)
+		httpError(writer, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	csvWriter := csv.NewWriter(encodingWriter)
 	err = csvWriter.Write([]string{
 		"id",
 		"name",
@@ -141,6 +156,8 @@ func (srv *Server) handleLocationRequest(writer http.ResponseWriter, request *ht
 		startId = 0
 	}
 
+	chosenEncoding := strings.ToLower(request.URL.Query().Get("encoding"))
+
 	locations, err := srv.querier.GetLocationData(request.Context(), startId)
 	if err != nil {
 		log.Printf("error getting data: %s", err)
@@ -148,9 +165,17 @@ func (srv *Server) handleLocationRequest(writer http.ResponseWriter, request *ht
 		return
 	}
 
-	writer.Header().Set("Content-Type", "text/csv")
+	writer.Header().Set("Content-Type", "text/csv; charset="+chosenEncoding)
 	writer.Header().Set("Content-Disposition", "attachment; filename=locations.csv")
-	csvWriter := csv.NewWriter(writer)
+
+	encodingWriter, err := encoding.NewResponseWriter(writer, chosenEncoding)
+	if err != nil {
+		log.Printf("encoding error: %v", err)
+		httpError(writer, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	csvWriter := csv.NewWriter(encodingWriter)
 	err = csvWriter.Write([]string{
 		"id",
 		"name",
