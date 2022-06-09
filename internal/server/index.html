@@ -9,12 +9,20 @@
     <form action="parts.csv" method="get">
         <label for="parts-start-id">Start-ID</label>
         <input type="number" name="startID" id="parts-start-id">
+        <select name="encoding">
+            <option value="utf-8">UTF-8</option>
+            <option value="iso-8859-1">ISO 8859-1</option>
+        </select>
         <button type="submit">Download</button>
     </form>
     <h2>Locations</h2>
     <form action="locations.csv" method="get">
         <label for="locations-start-id">Start-ID</label>
         <input type="number" name="startID" id="locations-start-id">
+        <select name="encoding">
+            <option value="utf-8">UTF-8</option>
+            <option value="iso-8859-1">ISO 8859-1</option>
+        </select>
         <button type="submit">Download</button>
     </form>
 </body>
